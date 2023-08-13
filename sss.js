@@ -1,30 +1,77 @@
+let validChoices = ["stone", "scroll", "shears"];
+let playerSelection;
+let computerSelection;
+let playerSelectionUnconfirmed;
+
 
 function getComputerChoice() {
-    let choices = ["stone", "scroll", "shears"];
-    let randomChoice = Math.floor(Math.random() * choices.length);
-  
-    return choices[randomChoice];
+    let randomChoice = Math.floor(Math.random() * validChoices.length);
+    return validChoices[randomChoice];
 }
 
-// Write input statement here to gather player selection rather than literal implementation
-const playerSelection = "stone";
+function playRound() {
+    playerSelectionUnconfirmed = true;
+    let result;
+    let roundScore = 0;
+    let responses;
 
-function playRound(playerSelection, computerSelection) {
+    while (playerSelectionUnconfirmed) {
+        playerSelection = prompt("CHOOSE: STONE || SCROLL || SHEARS: ");
+        playerSelection = playerSelection.toLowerCase();
+
+        if (validChoices.includes(playerSelection)) {
+            playerSelectionUnconfirmed = false;
+        } else {
+            console.log("If you have any honor at all, you'll choose on of the valid options.")
+        }
+    }
+    
+    computerSelection = getComputerChoice();
+
     if (playerSelection === computerSelection) {
-        return "It's a tie!";
+        result = "It's a tie!";
+        roundScore = 0.5;
     }
     if (playerSelection === "stone") {
-        return (computerSelection === "scroll") ? "You lose! Scroll beats stone!" : "You win! Stone beats shears!";
+        responses = ["You lose! Scroll beats stone!","You win! Stone beats shears!"];
+        roundScore = (computerSelection === "scroll") ? 0 : 1;
     } else if (playerSelection === "scroll") {
-        return (computerSelection === "shears") ? "You lose! Shears beats scroll!" : "You win! Scroll beats stone!";
+        responses = ["You lose! Shears beats scroll!","You win! Scroll beats stone!"];
+        roundScore = (computerSelection === "shears") ? 0 : 1;
     } else if (playerSelection === "shears") {
-        return (computerSelection === "stone") ? "You lose! Stone beats shears!" : "You win! Shears beats scroll!";
+        responses = ["You lose! Stone beats shears!", "You win! Shears beats scroll!"];
+        roundScore = (computerSelection === "stone") ? 0 : 1;
+    } 
+    console.log(responses[roundScore] + " Roundscore: " + roundScore);
+    return roundScore;
+
+    
+}
+
+function game() {
+    roundCounter = 0;
+    gameActive = true;
+    let overallScore = 0;
+
+    while (gameActive) {
+        overallScore = overallScore + playRound();
+        
+        roundCounter++;
+        if (roundCounter > 4) {
+            gameActive = false;
+            console.log("Game over!");
+        }
+    }
+
+    console.log("Overall Score: " + overallScore + " / 5");
+
+    if (overallScore > 2.5) {
+        console.log("You won! You will rest peacefully in Valhalla.");
+    } else if (overallScore < 2.5) {
+        console.log("You lost! You're denied entry to Valhalla and will roam the nether realm forever discontent.")
     }
 }
 
 
-
-
-const computerSelection = getComputerChoice();
 
 
