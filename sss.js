@@ -4,12 +4,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let computerScore = 0;
     let maxScore = 0;
     let gameOver = false;
-    let messageText;
+    let messageText = 'Stone? Scroll? Shears? Choose wisely brave warrior.';
     let validChoices = ["stone", "scroll", "shears"];
 
-    const btns = document.querySelectorAll('button');
+    const btns = document.querySelectorAll('#playerChoices button');
     const resultsBox = document.querySelector('#resultsBox');
     const scoreBox = document.querySelector('#scoreBox');
+    const resetGameButton = document.querySelector('#newGameButton');
 
     function getComputerChoice() {
         let randomChoice = Math.floor(Math.random() * validChoices.length);
@@ -69,6 +70,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             // write code to disable buttons until reset button is clicked
             gameOver = true;
+
+            btns.forEach((btn) => {
+                btn.removeEventListener('click', () => {
+                    newGame(btn); 
+                });
+                btn.disabled = true;
+            });
         }
         return msg;
     }
@@ -84,16 +92,26 @@ document.addEventListener('DOMContentLoaded', () => {
         scoreBox.textContent = `Your score: ${playerScore}  |  Opponent score: ${computerScore}`;
     }
 
+    function resetGame() {
+        window.location.reload();
+    }
 
+    function newGame(btn) {
+        const roundResults =  playRound(btn.id);
+        updateScore(roundResults);
+        const endOfGameText = checkForEndOfGame(maxScore, 5);
+        updateText(endOfGameText, roundResults);
+
+    }
 
     btns.forEach((btn) => {
         btn.addEventListener('click', () => {
-            const roundResults =  playRound(btn.id);
-            updateScore(roundResults);
-            const endOfGameText = checkForEndOfGame(maxScore, 5);
-            updateText(endOfGameText, roundResults);
+            newGame(btn);
         });
     });
+    resultsBox.textContent = messageText;
+    resetGameButton.addEventListener('click', resetGame);
+
 });
 
 
