@@ -1,2 +1,2 @@
 # Stone Scroll Shears
-Medieval take on the classic game Rock || Paper || Scissors.
+Game logic for medieval take on the classic game Rock || Paper || Scissors.
