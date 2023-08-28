@@ -1,64 +1,100 @@
-let computerSelection;
-
-function getComputerChoice() {
-    let randomChoice = Math.floor(Math.random() * validChoices.length);
-    return validChoices[randomChoice];
-}
-
-function playRound(playerSelection) {
-    let result;
-    let roundScore = 0;
-    let responses;
-    
-    computerSelection = getComputerChoice();
-
-    if (playerSelection === computerSelection) {
-        result = "It's a tie!";
-        roundScore = 0.5;
-    }
-    if (playerSelection === "stone") {
-        responses = ["You lose! Scroll beats stone!","You win! Stone beats shears!"];
-        roundScore = (computerSelection === "scroll") ? 0 : 1;
-    } else if (playerSelection === "scroll") {
-        responses = ["You lose! Shears beats scroll!","You win! Scroll beats stone!"];
-        roundScore = (computerSelection === "shears") ? 0 : 1;
-    } else if (playerSelection === "shears") {
-        responses = ["You lose! Stone beats shears!", "You win! Shears beats scroll!"];
-        roundScore = (computerSelection === "stone") ? 0 : 1;
-    } 
-    console.log(responses[roundScore] + " Roundscore: " + roundScore);
-    return roundScore;
-
-    
-}
-
-function game() {
-    
-    gameActive = true;
+document.addEventListener('DOMContentLoaded', () => {
+    let computerSelection;
     let playerScore = 0;
     let computerScore = 0;
-    
-    let maxScore = max(playerScore, computerScore);
+    let maxScore = 0;
+    let gameOver = false;
+    let messageText;
+    let validChoices = ["stone", "scroll", "shears"];
 
-    console.log("Overall Score: " + overallScore + " / 5");
+    const btns = document.querySelectorAll('button');
+    const resultsBox = document.querySelector('#resultsBox');
+    const scoreBox = document.querySelector('#scoreBox');
 
-    // This needs to go into check for end of game function.
-    // if (overallScore > 2.5) {
-    //     console.log("You won! You will rest peacefully in Valhalla.");
-    // } else if (overallScore < 2.5) {
-    //     console.log("You lost! You're denied entry to Valhalla and will roam the nether realm forever discontent.")
-    // }
+    function getComputerChoice() {
+        let randomChoice = Math.floor(Math.random() * validChoices.length);
+        return validChoices[randomChoice];
+    }
+
+    function playRound(playerSelection) {
     
-    const btns = document.querySelectorAll('#playerChoices button');
-    
-    btns.forEach(btn => {
+        let playerRoundScore = 0;
+        let computerRoundScore = 0;
+        let responses;
+        let resultTxt;
+        let scoreTxt;
+        
+        computerSelection = getComputerChoice();
+
+        if (playerSelection === computerSelection) {
+            resultTxt = "It's a tie!";
+            playerRoundScore = 0.5;
+            computerRoundScore = 0.5;
+
+            return [playerRoundScore, computerRoundScore, resultTxt];
+        }
+        if (playerSelection === "stone") {
+            responses = ["You lose! Scroll beats stone!","You win! Stone beats shears!"];
+            playerRoundScore = (computerSelection === "scroll") ? 0 : 1;
+        } else if (playerSelection === "scroll") {
+            responses = ["You lose! Shears beats scroll!","You win! Scroll beats stone!"];
+            playerRoundScore = (computerSelection === "shears") ? 0 : 1;
+        } else if (playerSelection === "shears") {
+            responses = ["You lose! Stone beats shears!", "You win! Shears beats scroll!"];
+            playerRoundScore = (computerSelection === "stone") ? 0 : 1;
+        }
+        
+        computerRoundScore = (playerRoundScore > 0) ? 0 : 1;
+        resultTxt = `${responses[playerRoundScore]}  |   Roundscore:  ${playerRoundScore}`;
+        
+        return [playerRoundScore, computerRoundScore, resultTxt];  
+    }
+
+    function updateScore(roundResults) {
+        playerScore = playerScore + roundResults[0];
+        computerScore = computerScore + roundResults[1];
+        maxScore = Math.max(playerScore, computerScore);
+    }
+
+    function checkForEndOfGame (currentMaxScore, limit) {
+        let msg = '';
+        if (currentMaxScore >= limit) {
+            
+            if (playerScore > computerScore) {
+                msg = "You won! You will rest peacefully in Valhalla.";
+            } else if (playerScore < computerScore) {
+                msg = "You lost! You're denied entry to Valhalla and will roam the nether realm forever discontent.";
+            } else {
+                msg = "It's a tie. Both warriors live to see another battle.";
+            }
+            // write code to disable buttons until reset button is clicked
+            gameOver = true;
+        }
+        return msg;
+    }
+
+    function updateText(endOfGameText, roundResults) {
+        if (gameOver) {
+            messageText = endOfGameText;
+        } else {
+            messageText = roundResults[2];
+        }
+        // update DOM element with message Text
+        resultsBox.textContent = messageText;
+        scoreBox.textContent = `Your score: ${playerScore}  |  Opponent score: ${computerScore}`;
+    }
+
+
+
+    btns.forEach((btn) => {
         btn.addEventListener('click', () => {
-            playRound(btn.id);
-            // Update score
-            // Check for end of game
+            const roundResults =  playRound(btn.id);
+            updateScore(roundResults);
+            const endOfGameText = checkForEndOfGame(maxScore, 5);
+            updateText(endOfGameText, roundResults);
         });
     });
-}
+});
 
 
 
